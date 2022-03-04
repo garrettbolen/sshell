@@ -16,6 +16,7 @@ int main(void)
 {
     char *args[MAX_LINE / 2 + 1]; /* max of 40 arguments */
     int should_run = 1;
+    int parentWaits = 0;
     int i, upper;
     // char command[MAX_LINE + 1];
     while (should_run) {
@@ -30,7 +31,7 @@ int main(void)
         
         // read user input
         scanf("%[^\n]s", command);
-        printf("%s\n", command);
+        // printf("%s\n", command);
 
         char * token = strtok(command, " ");
         int i = 0;
@@ -42,6 +43,9 @@ int main(void)
         }
 
         args[i] = NULL;
+
+        if (strcmp(args[0], "&") == 0) parentWaits = 1;
+        if ((strcmp(args[0], "exit") == 0) || (strcmp(args[0], "quit") == 0)) break;
 
         // fork
         int pid = fork();
@@ -57,10 +61,8 @@ int main(void)
             // we are the parent
             // wait to finish
             // if & ignore this, don't wait
-            wait(NULL);
+            if (parentWaits) wait(NULL);
         }
-
-        break;
 
    }
 
