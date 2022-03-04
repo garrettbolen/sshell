@@ -30,8 +30,7 @@ int main(void)
         char command[MAX_LINE + 1];
         
         // read user input
-        scanf("%[^\n]s", command);
-        // printf("%s\n", command);
+        scanf(" %[^\n]s", command);
 
         char * token = strtok(command, " ");
         int i = 0;
@@ -44,7 +43,13 @@ int main(void)
 
         args[i] = NULL;
 
-        if (strcmp(args[0], "&") == 0) parentWaits = 1;
+        // if parent needs to wait
+        if (strcmp(args[i - 1], "&") == 0) {
+            parentWaits = 1;
+            args[i - 1] = NULL;
+        }
+
+        // to quit program
         if ((strcmp(args[0], "exit") == 0) || (strcmp(args[0], "quit") == 0)) break;
 
         // fork
@@ -55,13 +60,18 @@ int main(void)
             exit(1);
         }
 
+        // the child
         if (pid == 0) {
             execvp(args[0], args);
-        } else {
-            // we are the parent
-            // wait to finish
-            // if & ignore this, don't wait
-            if (parentWaits) wait(NULL);
+        } 
+        
+        // the parent
+        else {
+            if (parentWaits) {
+                printf("made it");
+                wait(NULL);
+                parentWaits = 0;
+            }
         }
 
    }
